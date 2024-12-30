@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:rest_api_app/models/users.dart';
+import 'package:rest_api_app/screens/add_do.dart';
+import 'package:rest_api_app/screens/edit_page.dart';
 import 'package:rest_api_app/services/user_api.dart';
+import 'package:http/http.dart' as http;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -11,6 +16,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Users> users = [];
+  List<dynamic> items = [];
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -36,39 +43,106 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildBody(BuildContext context) {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          tileColor: users[index].gender! == 'male'
-              ? const Color.fromARGB(255, 142, 204, 255)
-              : Color.fromARGB(255, 255, 134, 174),
-          subtitle: Text(
-            users[index].email.toString(),
-            style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-          ),
-          title: Text(
-            users[index].name.toString(),
-            style: TextStyle(color: const Color.fromARGB(255, 61, 61, 61)),
-          ),
-          leading: Image.network(
-            users[index].picture!.large.toString(),
-            fit: BoxFit.cover,
-          ),
-        );
-      },
+    return Visibility(
+      visible: isLoading,
+      replacement: RefreshIndicator(
+        onRefresh: fetchData,
+        child: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final String id = items[index]['_id'];
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text(
+                  index.toString(),
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              title: Text(items[index]['title'].toString()),
+              trailing: PopupMenuButton(
+                onSelected: (value) {
+                  value ? EditPage() : {deleteById(id)};
+                },
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      child: Text('Edit'),
+                      value: true,
+                    ),
+                    PopupMenuItem(
+                      child: Text('Delete'),
+                      value: false,
+                    ),
+                  ];
+                },
+              ),
+            );
+          },
+        ),
+      ),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 
   _buildFloatingActionButton() {
     return FloatingActionButton(
-        onPressed: () {}, child: Image.asset('assets/images/demo.jpg'));
+        onPressed: navigatieAddPage,
+        //onPressed: fetchData,
+        //child: Image.asset('assets/images/demo.jpg'));
+        child: Text('+'));
   }
 
   Future<void> fetchData() async {
-    final response = await UserApi.fetchApi();
+    final url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
+    final uri = Uri.parse(url);
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final results = jsonDecode(response.body) as Map;
+      setState(() {
+        items = results['items'] as List;
+      });
+    } else {}
     setState(() {
-      users = response;
+      isLoading = false;
     });
+  }
+
+  Future<void> navigatieAddPage() async {
+    final route = MaterialPageRoute(
+      builder: (context) => AddPage(),
+    );
+    await Navigator.push(context, route);
+    setState(() {
+      isLoading = true;
+    });
+    fetchData();
+  }
+
+  Future<void> deleteById(String id) async {
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.delete(uri);
+    response.statusCode == 200
+        ? showSuccessMessage('Xóa thành công')
+        : showErrorMessage(
+            "Thất bại. Lỗi ${jsonDecode(response.body)['message'].toString()}");
+  }
+
+  void showSuccessMessage(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.lightGreen[400],
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void showErrorMessage(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red[400],
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
