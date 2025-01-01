@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:rest_api_app/models/users.dart';
-import 'package:rest_api_app/screens/add_do.dart';
-import 'package:rest_api_app/screens/edit_page.dart';
-import 'package:rest_api_app/services/user_api.dart';
-import 'package:http/http.dart' as http;
+import 'package:rest_api_app/helpers/snak_bar_helper.dart';
+import 'package:rest_api_app/models/todo.dart';
+import 'package:rest_api_app/screens/todo.dart';
+import 'package:rest_api_app/services/todo_api.dart';
+import 'package:rest_api_app/widget/card_todo.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -15,8 +13,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Users> users = [];
-  List<dynamic> items = [];
+  List<Todo> todos = [];
   bool isLoading = true;
   @override
   void initState() {
@@ -47,37 +44,20 @@ class _MyHomePageState extends State<MyHomePage> {
       visible: isLoading,
       replacement: RefreshIndicator(
         onRefresh: fetchData,
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final String id = items[index]['_id'];
-            return ListTile(
-              leading: CircleAvatar(
-                child: Text(
-                  index.toString(),
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-              title: Text(items[index]['title'].toString()),
-              trailing: PopupMenuButton(
-                onSelected: (value) {
-                  value ? EditPage() : {deleteById(id)};
-                },
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(
-                      child: Text('Edit'),
-                      value: true,
-                    ),
-                    PopupMenuItem(
-                      child: Text('Delete'),
-                      value: false,
-                    ),
-                  ];
-                },
-              ),
-            );
-          },
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(10.0),
+          child: Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: todos.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                return CardTodo(
+                  todo: item,
+                  index: index,
+                  onTap: () async => await navigatieTodoPagev2(index, item),
+                );
+              }).toList()),
         ),
       ),
       child: Center(
@@ -88,30 +68,56 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _buildFloatingActionButton() {
     return FloatingActionButton(
-        onPressed: navigatieAddPage,
-        //onPressed: fetchData,
-        //child: Image.asset('assets/images/demo.jpg'));
-        child: Text('+'));
+      onPressed: navigatieTodoPage,
+      shape: CircleBorder(),
+      child: ClipOval(
+        // child: Image.asset(
+        //   'assets/images/demo.jpg',
+        //   fit: BoxFit
+        //       .cover,
+        // ),
+        child: Text(
+          '+',
+          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
   }
 
   Future<void> fetchData() async {
-    final url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
-    final uri = Uri.parse(url);
-    final response = await http.get(uri);
-    if (response.statusCode == 200) {
-      final results = jsonDecode(response.body) as Map;
-      setState(() {
-        items = results['items'] as List;
-      });
-    } else {}
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
+    try {
+      todos = await TodoApi.getApi();
+    } catch (error) {
+      if (mounted) {
+        SnackBarHelper.showErrorMessage(context, 'Error fetching data: $error');
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  Future<void> navigatieAddPage() async {
+  Future<void> navigatieTodoPage() async {
     final route = MaterialPageRoute(
-      builder: (context) => AddPage(),
+      builder: (context) => TodoPage(),
+    );
+    await Navigator.push(context, route);
+    setState(() {
+      isLoading = true;
+    });
+    fetchData();
+  }
+
+  Future<void> navigatieTodoPagev2(int index, Todo todo) async {
+    final route = MaterialPageRoute(
+      builder: (context) => TodoPage(
+        index: index,
+        todo: todo,
+      ),
     );
     await Navigator.push(context, route);
     setState(() {
@@ -121,28 +127,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> deleteById(String id) async {
-    final url = 'https://api.nstack.in/v1/todos/$id';
-    final uri = Uri.parse(url);
-    final response = await http.delete(uri);
-    response.statusCode == 200
-        ? showSuccessMessage('Xóa thành công')
-        : showErrorMessage(
-            "Thất bại. Lỗi ${jsonDecode(response.body)['message'].toString()}");
-  }
-
-  void showSuccessMessage(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.lightGreen[400],
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void showErrorMessage(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.red[400],
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final res = await TodoApi.deleteApiById(id);
+    if (mounted) {
+      if (res) {
+        SnackBarHelper.showSuccessMessage(context, 'Xóa thành công');
+        setState(() {
+          todos.removeWhere((todo) => todo.sId == id);
+        });
+      } else {
+        SnackBarHelper.showErrorMessage(context, "Thất bại.");
+      }
+    }
   }
 }

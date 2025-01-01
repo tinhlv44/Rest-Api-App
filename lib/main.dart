@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api_app/screens/my_home_page.dart';
+import 'package:flutter/services.dart';
+import 'package:rest_api_app/constants/theme.dart';
+import 'package:rest_api_app/router/routers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,21 +9,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.light,
+    ));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Rest API Call',
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-          actionIconTheme: ActionIconThemeData(
-            endDrawerButtonIconBuilder: (context) =>
-                Center(child: Icon(Icons.home)),
-          )),
-      home: const MyHomePage(),
+      theme: AppTheme.lightTheme,
+      initialRoute: '/',
+      onGenerateRoute: Routes.generateRoute,
     );
   }
 }
