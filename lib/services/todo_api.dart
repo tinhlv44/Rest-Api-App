@@ -47,8 +47,7 @@ class TodoApi {
     return response.statusCode == 200;
   }
 
-  static Future<SubmitResult> postApi(
-      {String? title, String? description}) async {
+  static Future<bool> postApi({String? title, String? description}) async {
     final body = {
       "title": title,
       "description": description,
@@ -56,32 +55,15 @@ class TodoApi {
     };
     final url = 'https://api.nstack.in/v1/todos';
     final uri = Uri.parse(url);
-    try {
-      final response = await http.post(
-        uri,
-        body: jsonEncode(body),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 201) {
-        return SubmitResult(SubmitStatus.success, "Thêm thành công!");
-      } else if (response.statusCode == 400) {
-        final errors =
-            jsonDecode(response.body)["errors"] as Map<String, dynamic>;
-        final errorMessage =
-            errors.entries.map((e) => "${e.key}: ${e.value}").join("\n");
-        return SubmitResult(SubmitStatus.validationError, errorMessage);
-      } else {
-        return SubmitResult(
-            SubmitStatus.serverError, "Đã xảy ra lỗi trên máy chủ.");
-      }
-    } catch (e) {
-      return SubmitResult(
-          SubmitStatus.networkError, "Lỗi khi kết nối tới máy chủ: $e");
-    }
+    final response = await http.post(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return response.statusCode == 201;
   }
 
-  static Future<SubmitResult> putApi({Todo? todo}) async {
+  static Future<bool> putApi({Todo? todo}) async {
     final body = {
       "title": todo!.title,
       "description": todo.description,
@@ -90,25 +72,11 @@ class TodoApi {
     final id = todo.sId;
     final url = 'https://api.nstack.in/v1/todos/$id';
     final uri = Uri.parse(url);
-    try {
-      final response = await http.put(
-        uri,
-        body: jsonEncode(body),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        return SubmitResult(SubmitStatus.success, "Cập nhật thành công!");
-      } else if (response.statusCode == 400) {
-        final errors = jsonDecode(response.body)["message"];
-        return SubmitResult(SubmitStatus.validationError, errors);
-      } else {
-        return SubmitResult(
-            SubmitStatus.serverError, "Đã xảy ra lỗi trên máy chủ.${id}");
-      }
-    } catch (e) {
-      return SubmitResult(
-          SubmitStatus.networkError, "Lỗi khi kết nối tới máy chủ: $e");
-    }
+    final response = await http.put(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return response.statusCode == 200;
   }
 }

@@ -26,7 +26,7 @@ class _CardTodoState extends State<CardTodo> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: MediaQuery.of(context).size.width / 2 - 16,
+            width: MediaQuery.of(context).size.width / 2 - 14,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),

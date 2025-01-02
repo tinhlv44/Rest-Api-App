@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
 import 'package:rest_api_app/models/todo.dart';
+import 'package:rest_api_app/models/todonavi.dart';
 import 'package:rest_api_app/screens/todo.dart';
 import 'package:rest_api_app/services/todo_api.dart';
 import 'package:rest_api_app/widget/card_todo.dart';
@@ -32,9 +33,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _buildAppBar() {
     return AppBar(
-      title: Text(
-        'Rest Api Call',
-        style: TextStyle(color: Colors.green),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.api, color: Colors.green),
+          SizedBox(
+            width: 8,
+          ),
+          Text(
+            'Rest Api Call',
+            style: TextStyle(color: Colors.green),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -44,20 +55,38 @@ class _MyHomePageState extends State<MyHomePage> {
       visible: isLoading,
       replacement: RefreshIndicator(
         onRefresh: fetchData,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(10.0),
-          child: Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: todos.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                return CardTodo(
-                  todo: item,
-                  index: index,
-                  onTap: () async => await navigatieTodoPagev2(index, item),
-                );
-              }).toList()),
+        child: Visibility(
+          visible: todos.isNotEmpty,
+          replacement: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/demo.jpg'),
+                  backgroundColor: Colors.red,
+                ),
+                Text(
+                  'No have Todo!',
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(10.0),
+            child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: todos.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  return CardTodo(
+                    todo: item,
+                    index: index,
+                    onTap: () async => await navigatieTodoPagev2(index, item),
+                  );
+                }).toList()),
+          ),
         ),
       ),
       child: Center(
@@ -69,17 +98,12 @@ class _MyHomePageState extends State<MyHomePage> {
   _buildFloatingActionButton() {
     return FloatingActionButton(
       onPressed: navigatieTodoPage,
-      shape: CircleBorder(),
-      child: ClipOval(
-        // child: Image.asset(
-        //   'assets/images/demo.jpg',
-        //   fit: BoxFit
-        //       .cover,
-        // ),
-        child: Text(
-          '+',
-          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-        ),
+      child: Text(
+        '+',
+        style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Colors.greenAccent[300]),
       ),
     );
   }
@@ -91,9 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       todos = await TodoApi.getApi();
     } catch (error) {
-      if (mounted) {
-        SnackBarHelper.showErrorMessage(context, 'Error fetching data: $error');
-      }
+      showErrorMessage(context, message: 'Error fetching data: $error');
     } finally {
       setState(() {
         isLoading = false;
@@ -113,29 +135,67 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigatieTodoPagev2(int index, Todo todo) async {
-    final route = MaterialPageRoute(
+    final route = MaterialPageRoute<Todonavi>(
       builder: (context) => TodoPage(
         index: index,
         todo: todo,
       ),
     );
-    await Navigator.push(context, route);
-    setState(() {
-      isLoading = true;
-    });
-    fetchData();
+    final Todonavi? result = await Navigator.push(context, route);
+    if (result != null) {
+      if (result.x == 2) {
+        setState(() {
+          todos.removeWhere(
+            (element) => element.sId == result.todo.sId,
+          );
+        });
+        return;
+      }
+      if (result.x == 1) {
+        setState(() {
+          todos = todos.map((todo) {
+            if (todo.sId == result.todo.sId) {
+              return Todo(
+                sId: todo.sId,
+                title: result.todo.title,
+                description: result.todo.description,
+                isCompleted: todo.isCompleted,
+                createdAt: todo.createdAt,
+                updatedAt: DateTime.now(), // Cập nhật thời gian
+              );
+            }
+            return todo; // Trả lại các phần tử không thay đổi
+          }).toList();
+        });
+        return;
+      }
+      if (result.x == 0) {
+        setState(() {
+          todos.add(result.todo);
+        });
+        return;
+      }
+      setState(() {
+        isLoading = true;
+      });
+      fetchData();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No data returned')),
+      );
+    }
   }
 
   Future<void> deleteById(String id) async {
     final res = await TodoApi.deleteApiById(id);
     if (mounted) {
       if (res) {
-        SnackBarHelper.showSuccessMessage(context, 'Xóa thành công');
+        showSuccessMessage(context, message: 'Xóa thành công');
         setState(() {
           todos.removeWhere((todo) => todo.sId == id);
         });
       } else {
-        SnackBarHelper.showErrorMessage(context, "Thất bại.");
+        showErrorMessage(context, message: "Thất bại.");
       }
     }
   }

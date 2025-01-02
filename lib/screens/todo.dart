@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api_app/constants/enum.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
 import 'package:rest_api_app/models/todo.dart';
+import 'package:rest_api_app/models/todonavi.dart';
 import 'package:rest_api_app/services/todo_api.dart';
 
 class TodoPage extends StatefulWidget {
@@ -17,6 +17,7 @@ class _TodoPageState extends State<TodoPage> {
   TextEditingController titleInput = TextEditingController();
   TextEditingController descriptionInput = TextEditingController();
   bool isEdit = false;
+  Todo? newTodo;
   @override
   void initState() {
     super.initState();
@@ -32,17 +33,21 @@ class _TodoPageState extends State<TodoPage> {
     return Scaffold(
       appBar: AppBar(
         title: TitleAppBar(isEdit: isEdit),
-        actions: [
-          PopMenu(),
-        ],
+        actions: [isEdit ? PopMenu(widget: widget) : Container()],
         leading: IconButton(
             onPressed: () async {
               if (isEdit) {
-                await updateData();
+                final result = await updateData();
+                if (result) {
+                  showSuccessMessage(context, message: 'Cập nhật thành công.');
+                  Navigator.pop(context, Todonavi(x: 1, todo: newTodo!));
+                } else {
+                  showErrorMessage(context, message: 'Cập nhật thất bại');
+                }
               } else {
                 await submitData();
+                Navigator.pop(context, [0, newTodo]);
               }
-              Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back)),
       ),
@@ -65,7 +70,7 @@ class _TodoPageState extends State<TodoPage> {
                 controller: titleInput,
                 decoration: InputDecoration(
                     hintText: 'Tiêu đề', border: InputBorder.none),
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               TextField(
                 controller: descriptionInput,
@@ -86,89 +91,55 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
-  Future<void> updateData() async {
+  Future<bool> updateData() async {
     if (titleInput.text == '') {
-      SnackBarHelper.showErrorMessage(
-          context, 'Tiêu đề trống.\nKhongo thể cập nhật.');
-
-      return;
+      showErrorMessage(context,
+          message: 'Tiêu đề trống.\nKhongo thể cập nhật.');
+      return false;
     }
-    final result = await TodoApi.putApi(todo: widget.todo);
-    if (mounted) {
-      switch (result.status) {
-        case SubmitStatus.success:
-          SnackBarHelper.showSuccessMessage(context, result.message);
-          break;
-        case SubmitStatus.validationError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.serverError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.networkError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.unknownError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-      }
-    }
+    newTodo = widget.todo!.copyWith(
+      title: titleInput.text,
+      description: descriptionInput.text,
+    );
+    final result = await TodoApi.putApi(todo: newTodo);
+    return result;
   }
 
   Future<void> submitData() async {
-    if (titleInput.text == '' && descriptionInput.text == '') return;
+    if (titleInput.text == '' && descriptionInput.text == '') {
+//SnackBarHelper.showErrorMessage(context, 'Thêm thất bại');
+      return;
+    }
     final result = await TodoApi.postApi(
         title: titleInput.text, description: descriptionInput.text);
-    if (mounted) {
-      switch (result.status) {
-        case SubmitStatus.success:
-          SnackBarHelper.showSuccessMessage(context, result.message);
-          break;
-        case SubmitStatus.validationError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.serverError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.networkError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-        case SubmitStatus.unknownError:
-          SnackBarHelper.showErrorMessage(context, result.message);
-          break;
-      }
+    if (result) {
+      showSuccessMessage(context, message: 'Thêm thành công.');
+    } else {
+      showErrorMessage(context, message: 'Thêm thất bại');
     }
-  }
-}
-
-class TitleAppBar extends StatelessWidget {
-  const TitleAppBar({
-    super.key,
-    required this.isEdit,
-  });
-
-  final bool isEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(isEdit ? 'Chỉnh sửa' : 'Thêm');
   }
 }
 
 class PopMenu extends StatelessWidget {
   const PopMenu({
     super.key,
+    required this.widget,
   });
+
+  final TodoPage widget;
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
-      onSelected: (value) {
+      onSelected: (value) async {
         // Xử lý khi người dùng chọn một mục trong PopupMenu
-        if (value == 1) {
-          print("Chọn Edit");
-        } else if (value == 2) {
-          print("Chọn Delete");
+        if (value == 2) {
+          await TodoApi.postApi(
+              title: widget.todo!.title, description: widget.todo!.description);
+          Navigator.pop(context, Todonavi(x: 0, todo: widget.todo!));
+        } else if (value == 1) {
+          await TodoApi.deleteApiById(widget.todo!.sId);
+          Navigator.pop(context, Todonavi(x: 2, todo: widget.todo!));
         }
       },
       itemBuilder: (BuildContext context) => [
@@ -196,5 +167,19 @@ class PopMenu extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class TitleAppBar extends StatelessWidget {
+  const TitleAppBar({
+    super.key,
+    required this.isEdit,
+  });
+
+  final bool isEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(isEdit ? 'Chỉnh sửa' : 'Thêm');
   }
 }

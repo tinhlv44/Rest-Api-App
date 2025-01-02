@@ -6,8 +6,8 @@ class AppTheme {
     primarySwatch: Colors.red,
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color.fromARGB(255, 234, 255, 231),
-      foregroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 253, 255, 252),
+      foregroundColor: Color.fromARGB(255, 0, 0, 0),
       elevation: 4,
     ),
     textTheme: const TextTheme(

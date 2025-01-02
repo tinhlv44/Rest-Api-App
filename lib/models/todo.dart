@@ -38,4 +38,22 @@ class Todo {
     data['updated_at'] = updatedAt;
     return data;
   }
+
+  Todo copyWith({
+    String? sId,
+    String? title,
+    String? description,
+    bool? isCompleted,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Todo(
+      sId: sId ?? this.sId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      isCompleted: isCompleted ?? this.isCompleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
