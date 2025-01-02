@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rest_api_app/screens/login.dart';
 import 'package:rest_api_app/screens/todo.dart';
 import 'package:rest_api_app/screens/my_home_page.dart';
 
 class Routes {
   static final Map<String, Widget Function(BuildContext)> routes = {
-    '/': (context) => MyHomePage(),
+    '/': (context) => LoginScreen(
+          show: () {},
+        ),
     '/todo': (context) => TodoPage(),
     //'/details': (context) => DetailsPage(),
     // Thêm các route khác tại đây

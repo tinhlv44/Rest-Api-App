@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:rest_api_app/auth/auth.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
 import 'package:rest_api_app/models/todo.dart';
 import 'package:rest_api_app/models/todonavi.dart';
 import 'package:rest_api_app/screens/todo.dart';
 import 'package:rest_api_app/services/todo_api.dart';
+import 'package:rest_api_app/util/auth_manager.dart';
 import 'package:rest_api_app/widget/card_todo.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -51,48 +53,70 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildBody(BuildContext context) {
-    return Visibility(
-      visible: isLoading,
-      replacement: RefreshIndicator(
-        onRefresh: fetchData,
-        child: Visibility(
-          visible: todos.isNotEmpty,
-          replacement: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/demo.jpg'),
-                  backgroundColor: Colors.red,
-                ),
-                Text(
-                  'No have Todo!',
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-                ),
-              ],
+    return Stack(children: [
+      Visibility(
+        visible: isLoading,
+        replacement: RefreshIndicator(
+          onRefresh: fetchData,
+          child: Visibility(
+            visible: todos.isNotEmpty,
+            replacement: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/demo.jpg'),
+                    backgroundColor: Colors.red,
+                  ),
+                  Text(
+                    'No have Todo!',
+                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(10.0),
+              child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: todos.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    return CardTodo(
+                      todo: item,
+                      index: index,
+                      onTap: () async => await navigatieTodoPagev2(index, item),
+                    );
+                  }).toList()),
             ),
           ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(10.0),
-            child: Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: todos.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  return CardTodo(
-                    todo: item,
-                    index: index,
-                    onTap: () async => await navigatieTodoPagev2(index, item),
-                  );
-                }).toList()),
+        ),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      Align(
+        alignment: Alignment.bottomLeft, // Định vị ở góc dưới bên phải
+        child: Padding(
+          padding: const EdgeInsets.all(20.0), // Khoảng cách từ mép
+          child: GestureDetector(
+            onTap: () {
+              AuthManager.logout();
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => AuthPage(),
+              ));
+            },
+            child: CircleAvatar(
+              child: Icon(
+                Icons.logout,
+                size: 30,
+              ),
+            ),
           ),
         ),
       ),
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    ]);
   }
 
   _buildFloatingActionButton() {

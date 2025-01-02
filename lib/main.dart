@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:rest_api_app/constants/theme.dart';
-import 'package:rest_api_app/router/routers.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rest_api_app/auth/auth.dart';
+import 'package:rest_api_app/gitit/gitit.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await getItInit();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.light,
-    ));
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: '/',
-      onGenerateRoute: Routes.generateRoute,
-    );
+    return ScreenUtilInit(
+        designSize: const Size(430, 932),
+        child:
+            MaterialApp(debugShowCheckedModeBanner: false, home: AuthPage()));
   }
 }
