@@ -81,6 +81,7 @@ class _SignUPScreenState extends State<SignUPScreen> {
                       duration: Duration(seconds: 1),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                    _dialogBuilder(context, left);
                   }, (right) {
                     Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => MyHomePage()));

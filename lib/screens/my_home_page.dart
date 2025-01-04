@@ -76,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.all(10.0),
               child: Wrap(
                   spacing: 8.0,
@@ -83,10 +84,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: todos.asMap().entries.map((entry) {
                     final index = entry.key;
                     final item = entry.value;
+                    final heroTag = 'todo_$index';
                     return CardTodo(
                       todo: item,
                       index: index,
-                      onTap: () async => await navigatieTodoPagev2(index, item),
+                      onTap: () async =>
+                          await navigatieTodoPagev2(index, item, heroTag),
+                      heroTag: heroTag,
                     );
                   }).toList()),
             ),
@@ -97,20 +101,41 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       Align(
-        alignment: Alignment.bottomLeft, // Định vị ở góc dưới bên phải
+        alignment: Alignment.bottomLeft,
         child: Padding(
-          padding: const EdgeInsets.all(20.0), // Khoảng cách từ mép
+          padding: const EdgeInsets.all(20.0),
           child: GestureDetector(
             onTap: () {
               AuthManager.logout();
-              Navigator.of(context).push(MaterialPageRoute(
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => AuthPage(),
               ));
             },
-            child: CircleAvatar(
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color.fromARGB(0, 82, 80, 80),
+                    const Color.fromARGB(255, 197, 238, 198),
+                  ],
+                  tileMode: TileMode.clamp,
+                ),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
               child: Icon(
                 Icons.logout,
-                size: 30,
+                color: Colors.green.shade600,
+                size: 40,
               ),
             ),
           ),
@@ -120,14 +145,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildFloatingActionButton() {
+    final heroTag = 'addTodos';
     return FloatingActionButton(
-      onPressed: navigatieTodoPage,
-      child: Text(
-        '+',
-        style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-            color: Colors.greenAccent[300]),
+      onPressed: () => navigatieTodoPage(heroTag),
+      child: Icon(
+        Icons.add,
+        size: 40,
       ),
     );
   }
@@ -147,9 +170,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> navigatieTodoPage() async {
+  Future<void> navigatieTodoPage(String heroTag) async {
     final route = MaterialPageRoute(
-      builder: (context) => TodoPage(),
+      builder: (context) => TodoPage(heroTag: heroTag),
     );
     await Navigator.push(context, route);
     setState(() {
@@ -158,14 +181,24 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchData();
   }
 
-  Future<void> navigatieTodoPagev2(int index, Todo todo) async {
+  Future<void> navigatieTodoPagev2(int index, Todo todo, String heroTag) async {
+    // ignore: unused_local_variable
     final route = MaterialPageRoute<Todonavi>(
       builder: (context) => TodoPage(
         index: index,
         todo: todo,
+        heroTag: heroTag,
       ),
     );
-    final Todonavi? result = await Navigator.push(context, route);
+    final route2 = PageRouteBuilder<Todonavi>(
+      transitionDuration: Duration(milliseconds: 300), // Tăng thời gian
+      pageBuilder: (context, animation, secondaryAnimation) => TodoPage(
+        index: index,
+        todo: todo,
+        heroTag: heroTag,
+      ),
+    );
+    final Todonavi? result = await Navigator.push(context, route2);
     if (result != null) {
       if (result.x == 2) {
         setState(() {

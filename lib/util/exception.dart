@@ -27,3 +27,53 @@ class ApiException implements Exception {
     }
   }
 }
+
+// Định nghĩa lớp abstract để làm cha
+abstract class ApiTodosException implements Exception {
+  int? code;
+  String? message;
+  Response<dynamic>? response;
+
+  ApiTodosException(this.code, this.message, {this.response});
+
+  @override
+  String toString() {
+    return 'ApiTodosException: code=$code, message=$message, response=${response?.data}';
+  }
+}
+
+class GetApiTodosException extends ApiTodosException {
+  GetApiTodosException(super.code, super.message, {super.response}) {
+    if (super.code == 400) {
+      message = 'Lỗi server';
+    }
+    if (super.code == 429) {
+      super.message = 'Lỗi nhiều request';
+    }
+  }
+}
+
+class PostApiTodosException extends ApiTodosException {
+  PostApiTodosException(super.code, super.message, {super.response}) {
+    if (super.code == 400) {
+      message = 'Lỗi server';
+    }
+    if (super.code == 429) {
+      super.message = 'Lỗi nhiều request';
+    }
+  }
+}
+
+class GetByIdApiTodosException extends ApiTodosException {
+  GetByIdApiTodosException(super.code, super.message, {super.response}) {
+    if (super.code == 400) {
+      message = 'Lỗi server';
+    }
+    if (super.code == 404) {
+      message = 'Id k tìm thấy';
+    }
+    if (super.code == 429) {
+      super.message = 'Lỗi nhiều request';
+    }
+  }
+}

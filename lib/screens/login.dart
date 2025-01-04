@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     email.dispose();
     password.dispose();
@@ -74,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       duration: Duration(seconds: 1),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                    _dialogBuilder(context, left);
                   }, (right) {
                     Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => MyHomePage()));
@@ -85,12 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   return CircularProgressIndicator();
                 }
                 if (state is AuthInitState) {
-                  return Login();
+                  return login();
                 }
                 if (state is AuthRequestSuccessState) {
                   Widget widget = Text('');
                   state.response.fold((l) {
-                    widget = Login();
+                    widget = login();
                   }, (r) {
                     widget = Text(r);
                   });
@@ -102,9 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(height: 20.h),
             or(),
             SizedBox(height: 15.h),
-            WithGoogle(),
+            withGoogle(),
             SizedBox(height: 10.h),
-            WithApple(),
+            withApple(),
           ],
         ),
       ),
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Padding Login() {
+  Padding login() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: GestureDetector(
@@ -166,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Padding WithGoogle() {
+  Padding withGoogle() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Container(
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Padding WithApple() {
+  Padding withApple() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Container(
@@ -368,7 +368,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Padding logo() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 50.w),
-      child: Image.asset('assets/images/demo.jpg'),
+      child: Container(
+          width: 200,
+          height: 200,
+          child: Image.asset('assets/images/demo.jpg')),
     );
   }
 }

@@ -8,4 +8,11 @@ class DioProvider {
 
     return dio;
   }
+
+  static Dio createDioReqTodo() {
+    Dio dio = Dio(BaseOptions(
+      baseUrl: 'https://api.nstack.in/v1/todos',
+    ));
+    return dio;
+  }
 }

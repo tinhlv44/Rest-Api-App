@@ -7,7 +7,8 @@ import 'package:rest_api_app/services/todo_api.dart';
 class TodoPage extends StatefulWidget {
   final Todo? todo;
   final int? index;
-  const TodoPage({super.key, this.todo, this.index});
+  final String? heroTag;
+  const TodoPage({super.key, this.todo, this.index, this.heroTag});
 
   @override
   State<TodoPage> createState() => _TodoPageState();
@@ -57,7 +58,7 @@ class _TodoPageState extends State<TodoPage> {
 
   _buildBody() {
     return Hero(
-      tag: 'task_${widget.index}',
+      tag: widget.heroTag!,
       child: Material(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),

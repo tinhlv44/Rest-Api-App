@@ -5,11 +5,13 @@ class CardTodo extends StatefulWidget {
   final VoidCallback? onTap;
   final Todo todo;
   final int index;
+  final String heroTag;
   const CardTodo({
     super.key,
     this.onTap,
     required this.todo,
     required this.index,
+    required this.heroTag,
   });
 
   @override
@@ -19,10 +21,19 @@ class CardTodo extends StatefulWidget {
 class _CardTodoState extends State<CardTodo> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Hero(
-        tag: 'task_${widget.index}',
+    return Hero(
+      tag: widget.heroTag,
+      flightShuttleBuilder:
+          (flightContext, animation, direction, fromContext, toContext) {
+        return ScaleTransition(
+          scale: animation.drive(
+            CurveTween(curve: Curves.easeInOut), // Hiệu ứng mượt
+          ),
+          child: toContext.widget,
+        );
+      },
+      child: GestureDetector(
+        onTap: widget.onTap,
         child: Material(
           color: Colors.transparent,
           child: Container(
