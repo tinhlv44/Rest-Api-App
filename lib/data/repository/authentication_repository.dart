@@ -17,7 +17,7 @@ class AuthenticationRepository extends IAuthRepository {
     try {
       String token = await _datasource.login(username, password);
       if (token.isNotEmpty) {
-        return Right('login please');
+        return Right('Thành công');
       } else {
         return Left('error');
       }

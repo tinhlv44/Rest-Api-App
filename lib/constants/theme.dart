@@ -6,7 +6,7 @@ class AppTheme {
     primarySwatch: Colors.red,
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color.fromARGB(255, 253, 255, 252),
+      backgroundColor: Color.fromARGB(255, 189, 255, 175),
       foregroundColor: Color.fromARGB(255, 0, 0, 0),
       elevation: 4,
     ),
@@ -18,6 +18,11 @@ class AppTheme {
     buttonTheme: const ButtonThemeData(
       buttonColor: Colors.blue,
       textTheme: ButtonTextTheme.primary,
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: Colors.blue, // Màu nền của BottomNavigationBar
+      selectedItemColor: Colors.white, // Màu của mục được chọn
+      unselectedItemColor: Colors.grey, // Màu của mục không được chọn
     ),
   );
 

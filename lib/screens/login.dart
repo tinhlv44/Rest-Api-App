@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_bloc.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_event.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_state.dart';
-import 'package:rest_api_app/screens/my_home_page.dart';
+import 'package:rest_api_app/navi/navi.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback show;
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _dialogBuilder(context, left);
                   }, (right) {
                     Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MyHomePage()));
+                        MaterialPageRoute(builder: (context) => MyHomeApp()));
                   });
                 }
               },

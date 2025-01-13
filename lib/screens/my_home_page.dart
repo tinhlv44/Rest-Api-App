@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api_app/auth/auth.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
 import 'package:rest_api_app/models/todo.dart';
 import 'package:rest_api_app/models/todonavi.dart';
 import 'package:rest_api_app/screens/todo.dart';
 import 'package:rest_api_app/services/todo_api.dart';
-import 'package:rest_api_app/util/auth_manager.dart';
 import 'package:rest_api_app/widget/card_todo.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -27,121 +25,58 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(context),
+      body: _buildBody(),
       floatingActionButton: _buildFloatingActionButton(),
     );
   }
 
-  _buildAppBar() {
-    return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.api, color: Colors.green),
-          SizedBox(
-            width: 8,
+  _buildBody() {
+    return Visibility(
+      visible: isLoading,
+      replacement: RefreshIndicator(
+        onRefresh: fetchData,
+        child: Visibility(
+          visible: todos.isNotEmpty,
+          replacement: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/demo.jpg'),
+                  backgroundColor: Colors.red,
+                ),
+                Text(
+                  'No have Todo!',
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
           ),
-          Text(
-            'Rest Api Call',
-            style: TextStyle(color: Colors.green),
-            textAlign: TextAlign.center,
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.all(10.0),
+            child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: todos.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  final heroTag = 'todo_$index';
+                  return CardTodo(
+                    todo: item,
+                    index: index,
+                    onTap: () async =>
+                        await navigatieTodoPagev2(index, item, heroTag),
+                    heroTag: heroTag,
+                  );
+                }).toList()),
           ),
-        ],
+        ),
+      ),
+      child: Center(
+        child: CircularProgressIndicator(),
       ),
     );
-  }
-
-  _buildBody(BuildContext context) {
-    return Stack(children: [
-      Visibility(
-        visible: isLoading,
-        replacement: RefreshIndicator(
-          onRefresh: fetchData,
-          child: Visibility(
-            visible: todos.isNotEmpty,
-            replacement: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/demo.jpg'),
-                    backgroundColor: Colors.red,
-                  ),
-                  Text(
-                    'No have Todo!',
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.all(10.0),
-              child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: todos.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-                    final heroTag = 'todo_$index';
-                    return CardTodo(
-                      todo: item,
-                      index: index,
-                      onTap: () async =>
-                          await navigatieTodoPagev2(index, item, heroTag),
-                      heroTag: heroTag,
-                    );
-                  }).toList()),
-            ),
-          ),
-        ),
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      Align(
-        alignment: Alignment.bottomLeft,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: GestureDetector(
-            onTap: () {
-              AuthManager.logout();
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => AuthPage(),
-              ));
-            },
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color.fromARGB(0, 82, 80, 80),
-                    const Color.fromARGB(255, 197, 238, 198),
-                  ],
-                  tileMode: TileMode.clamp,
-                ),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: Offset(2, 2),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.logout,
-                color: Colors.green.shade600,
-                size: 40,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ]);
   }
 
   _buildFloatingActionButton() {
