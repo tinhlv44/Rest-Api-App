@@ -40,14 +40,13 @@ class _TodoPageState extends State<TodoPage> {
               if (isEdit) {
                 final result = await updateData();
                 if (result) {
-                  showSuccessMessage(context, message: 'Cập nhật thành công.');
-                  Navigator.pop(context, Todonavi(x: 1, todo: newTodo!));
+                  onEditSuccess(); // Gọi hàm xử lý khi cập nhật thành công
                 } else {
-                  showErrorMessage(context, message: 'Cập nhật thất bại');
+                  onEditFailure(); // Gọi hàm xử lý khi cập nhật thất bại
                 }
               } else {
                 await submitData();
-                Navigator.pop(context, [0, newTodo]);
+                onSubmitSuccess(); // Gọi hàm xử lý khi gửi dữ liệu thành công
               }
             },
             icon: Icon(Icons.arrow_back)),
@@ -94,8 +93,7 @@ class _TodoPageState extends State<TodoPage> {
 
   Future<bool> updateData() async {
     if (titleInput.text == '') {
-      showErrorMessage(context,
-          message: 'Tiêu đề trống.\nKhongo thể cập nhật.');
+      showErrorMessage(message: 'Tiêu đề trống.\nKhongo thể cập nhật.');
       return false;
     }
     newTodo = widget.todo!.copyWith(
@@ -106,22 +104,35 @@ class _TodoPageState extends State<TodoPage> {
     return result;
   }
 
+  void onEditSuccess() {
+    showSuccessMessage(message: 'Cập nhật thành công.');
+    Navigator.pop(context, Todonavi(x: 1, todo: newTodo!));
+  }
+
+  void onEditFailure() {
+    showErrorMessage(message: 'Cập nhật thất bại');
+  }
+
+  void onSubmitSuccess() {
+    Navigator.pop(context, [0, newTodo]);
+  }
+
   Future<void> submitData() async {
     if (titleInput.text == '' && descriptionInput.text == '') {
-//SnackBarHelper.showErrorMessage(context, 'Thêm thất bại');
+      showErrorMessage(message: 'Thêm thất bại');
       return;
     }
     final result = await TodoApi.postApi(
         title: titleInput.text, description: descriptionInput.text);
     if (result) {
-      showSuccessMessage(context, message: 'Thêm thành công.');
+      showSuccessMessage(message: 'Thêm thành công.');
     } else {
-      showErrorMessage(context, message: 'Thêm thất bại');
+      showErrorMessage(message: 'Thêm thất bại');
     }
   }
 }
 
-class PopMenu extends StatelessWidget {
+class PopMenu extends StatefulWidget {
   const PopMenu({
     super.key,
     required this.widget,
@@ -130,17 +141,23 @@ class PopMenu extends StatelessWidget {
   final TodoPage widget;
 
   @override
+  State<PopMenu> createState() => _PopMenuState();
+}
+
+class _PopMenuState extends State<PopMenu> {
+  @override
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
       onSelected: (value) async {
         // Xử lý khi người dùng chọn một mục trong PopupMenu
         if (value == 2) {
           await TodoApi.postApi(
-              title: widget.todo!.title, description: widget.todo!.description);
-          Navigator.pop(context, Todonavi(x: 0, todo: widget.todo!));
+              title: widget.widget.todo!.title,
+              description: widget.widget.todo!.description);
+          naviTodo(Todonavi(x: 0, todo: widget.widget.todo!));
         } else if (value == 1) {
-          await TodoApi.deleteApiById(widget.todo!.sId);
-          Navigator.pop(context, Todonavi(x: 2, todo: widget.todo!));
+          await TodoApi.deleteApiById(widget.widget.todo!.sId);
+          naviTodo(Todonavi(x: 0, todo: widget.widget.todo!));
         }
       },
       itemBuilder: (BuildContext context) => [
@@ -168,6 +185,10 @@ class PopMenu extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void naviTodo(Todonavi todonavi) {
+    Navigator.pop(context, todonavi);
   }
 }
 

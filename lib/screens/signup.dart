@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_bloc.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_event.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_state.dart';
-import 'package:rest_api_app/screens/my_home_page.dart';
+import 'package:rest_api_app/screens/my_home.dart';
 
 class SignUPScreen extends StatefulWidget {
   final VoidCallback show;
@@ -16,14 +15,14 @@ class SignUPScreen extends StatefulWidget {
 }
 
 class _SignUPScreenState extends State<SignUPScreen> {
-  FocusNode _focusNode1 = FocusNode();
-  FocusNode _focusNode2 = FocusNode();
-  FocusNode _focusNode4 = FocusNode();
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  final FocusNode _focusNode4 = FocusNode();
   final email = TextEditingController(text: 'a.nodirrrd@gmail.com');
   final password = TextEditingController(text: '12345678');
   final name = TextEditingController(text: 'airezarrr');
-  FocusNode _focusNode3 = FocusNode();
-  final Confirmpassword = TextEditingController(text: '12345678');
+  final FocusNode _focusNode3 = FocusNode();
+  final confirmpassword = TextEditingController(text: '12345678');
   bool visibil = true;
   @override
   void initState() {
@@ -38,7 +37,6 @@ class _SignUPScreenState extends State<SignUPScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     email.dispose();
     password.dispose();
@@ -110,9 +108,9 @@ class _SignUPScreenState extends State<SignUPScreen> {
             SizedBox(height: 15.h),
             or(),
             SizedBox(height: 15.h),
-            WithGoogle(),
+            withGoogle(),
             SizedBox(height: 10.h),
-            WithApple(),
+            withApple(),
           ],
         ),
       ),
@@ -151,7 +149,7 @@ class _SignUPScreenState extends State<SignUPScreen> {
       child: GestureDetector(
         onTap: () {
           BlocProvider.of<AuthBloc>(context).add(AuthRegisterRequest(
-              email.text, password.text, Confirmpassword.text, name.text));
+              email.text, password.text, confirmpassword.text, name.text));
         },
         child: Container(
           alignment: Alignment.center,
@@ -174,7 +172,7 @@ class _SignUPScreenState extends State<SignUPScreen> {
     );
   }
 
-  Padding WithGoogle() {
+  Padding withGoogle() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Container(
@@ -216,7 +214,7 @@ class _SignUPScreenState extends State<SignUPScreen> {
     );
   }
 
-  Padding WithApple() {
+  Padding withApple() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Container(
@@ -423,7 +421,7 @@ class _SignUPScreenState extends State<SignUPScreen> {
         ),
         child: TextField(
           style: TextStyle(fontSize: 18.sp, color: Colors.black),
-          controller: Confirmpassword,
+          controller: confirmpassword,
           focusNode: _focusNode3,
           obscureText: visibil,
           obscuringCharacter: '*',

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rest_api_app/data/bloc/auth_bloc/auth_bloc.dart';
@@ -16,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  FocusNode _focusNode1 = FocusNode();
-  FocusNode _focusNode2 = FocusNode();
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
   final email = TextEditingController();
   final password = TextEditingController();
   bool visibil = true;
@@ -368,7 +367,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Padding logo() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 50.w),
-      child: Container(
+      child: SizedBox(
           width: 200,
           height: 200,
           child: Image.asset('assets/images/demo.jpg')),

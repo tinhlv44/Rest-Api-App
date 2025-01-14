@@ -1,29 +1,19 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rest_api_app/gitit/gitit.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 
-final darkModeProvider = StateProvider<bool>((ref) => false);
+class ThemeProvider with ChangeNotifier {
+  bool _isDarkMode = false;
 
-class DarkModeNotifier extends StateNotifier<bool> {
-  DarkModeNotifier() : super(false);
+  bool get isDarkMode => _isDarkMode;
 
-  void toggleDarkMode() {
-    state = !state; // Đổi trạng thái
-  }
-}
-
-final darkModeNotifierProvider =
-    StateNotifierProvider<DarkModeNotifier, bool>((ref) {
-  return DarkModeNotifier();
-});
-
-class ModeAppManager {
-  static final SharedPreferences _sharedPref = locator.get();
-  static bool isDarkMode() {
-    return _sharedPref.getBool('darkmode') ?? false;
+  // Thay đổi chế độ Dark Mode
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners(); // Thông báo cho hệ thống khi trạng thái thay đổi
   }
 
-  static void setDarkMode(bool value) {
-    _sharedPref.setBool('darkmode', value);
+  // Đặt chế độ Dark Mode cụ thể
+  void setTheme(bool isDark) {
+    _isDarkMode = isDark;
+    notifyListeners(); // Thông báo cập nhật trạng thái
   }
 }

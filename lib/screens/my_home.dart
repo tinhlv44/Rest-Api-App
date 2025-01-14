@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
 import 'package:rest_api_app/models/todo.dart';
 import 'package:rest_api_app/models/todonavi.dart';
-import 'package:rest_api_app/screens/todo.dart';
+import 'package:rest_api_app/page/todo/todo.dart';
 import 'package:rest_api_app/services/todo_api.dart';
 import 'package:rest_api_app/widget/card_todo.dart';
 
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       todos = await TodoApi.getApi();
     } catch (error) {
-      showErrorMessage(context, message: 'Error fetching data: $error');
+      showErrorMessage(message: 'Error fetching data: $error');
     } finally {
       setState(() {
         isLoading = false;
@@ -172,9 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       fetchData();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No data returned')),
-      );
+      showErrorMessage(message: 'No data returned');
     }
   }
 
@@ -182,12 +180,12 @@ class _MyHomePageState extends State<MyHomePage> {
     final res = await TodoApi.deleteApiById(id);
     if (mounted) {
       if (res) {
-        showSuccessMessage(context, message: 'Xóa thành công');
+        showSuccessMessage(message: 'Xóa thành công');
         setState(() {
           todos.removeWhere((todo) => todo.sId == id);
         });
       } else {
-        showErrorMessage(context, message: "Thất bại.");
+        showErrorMessage(message: "Thất bại.");
       }
     }
   }

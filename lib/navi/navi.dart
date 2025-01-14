@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rest_api_app/models/rive_navi.dart';
-import 'package:rest_api_app/screens/my_home_page.dart';
+import 'package:rest_api_app/page/speechtotext/speechtotext.dart';
+import 'package:rest_api_app/screens/bartender.dart';
+import 'package:rest_api_app/screens/my_home.dart';
 import 'package:rest_api_app/screens/settings.dart';
+import 'package:rest_api_app/screens/text_to_speech.dart';
 import 'package:rive/rive.dart';
 
 class MyHomeApp extends StatefulWidget {
@@ -16,9 +19,9 @@ class _MyHomeAppState extends State<MyHomeApp> {
   List<StateMachineController?> listController = [];
   List<Widget> listPage = [
     MyHomePage(),
-    Placeholder(),
-    Placeholder(),
-    Placeholder(),
+    Bartender(),
+    TTSExample(),
+    Speechtotext(),
     SettingsPage()
   ];
   int selectedIcon = 0;
@@ -54,8 +57,8 @@ class _MyHomeAppState extends State<MyHomeApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(),
-        body: listPage[selectedIcon],
+        //appBar: _buildAppBar(),
+        body: SafeArea(child: listPage[selectedIcon]),
         bottomNavigationBar: _buildBottomNavigationBar());
   }
 

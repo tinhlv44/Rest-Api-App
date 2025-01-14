@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api_app/auth/auth.dart';
+import 'package:provider/provider.dart';
+import 'package:rest_api_app/page/auth/auth.dart';
 import 'package:rest_api_app/util/auth_manager.dart';
 import 'package:rest_api_app/util/mode.dart';
 
@@ -13,6 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -20,15 +22,15 @@ class _SettingsPageState extends State<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              ModeAppManager.isDarkMode() ? 'Dark Mode' : 'Light Mode',
+              themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 20),
             Switch(
-              value: ModeAppManager.isDarkMode(),
+              value: themeProvider.isDarkMode,
               onChanged: (bool value) {
                 setState(() {
-                  ModeAppManager.setDarkMode(value);
+                  themeProvider.setTheme(value);
                 });
               },
             ),
@@ -57,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withAlpha((0.5 * 255).toInt()),
                 blurRadius: 4,
                 offset: Offset(2, 2),
               ),
