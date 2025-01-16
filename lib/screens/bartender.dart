@@ -1,11 +1,12 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:rest_api_app/page/tail/detail_tail.dart';
 
 class Bartender extends StatefulWidget {
+  const Bartender({super.key});
+
   @override
-  _BartenderState createState() => _BartenderState();
+  State<Bartender> createState() => _BartenderState();
 }
 
 class _BartenderState extends State<Bartender> {
@@ -68,150 +69,202 @@ class _BartenderState extends State<Bartender> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 200,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: list.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPage = index;
-                _stopAutoScroll();
-                _restartAutoScroll();
-              });
-            },
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage(
-                          'assets/images/demo.jpg',
-                        ),
-                        fit: BoxFit.cover),
-                    color: const Color.fromARGB(255, 24, 24, 24),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(12)), // Bo góc cho container
-                  ),
-                  child: Center(
-                    child: Text(
-                      list[index],
-                      style: TextStyle(fontSize: 30, color: Colors.white),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.all(12),
+            padding: EdgeInsets.only(left: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: Colors.white,
+              border: Border.all(color: Colors.white60, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search,
+                  color: Colors.black,
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {},
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm',
+                      hintStyle: TextStyle(
+                          color: const Color.fromARGB(255, 184, 184, 184)),
+                      border: InputBorder.none,
                     ),
                   ),
                 ),
-              );
-            },
+                SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(Icons.clear, color: Colors.grey),
+                  onPressed: () {
+                    //onChanged(''); // Clear search callback
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        // Dots Indicator
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            list.length,
-            (index) => AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 4.0),
-              height: 10,
-              width: 10,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == index ? Colors.blue : Colors.grey,
+          SizedBox(
+            height: 200,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: list.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                  _stopAutoScroll();
+                  _restartAutoScroll();
+                });
+              },
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(
+                            'assets/images/demo.jpg',
+                          ),
+                          fit: BoxFit.cover),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(30)), // Bo góc cho container
+                    ),
+                    child: Center(
+                      child: Text(
+                        list[index],
+                        style: TextStyle(fontSize: 30, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          // Dots Indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              list.length,
+              (index) => AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                margin: EdgeInsets.symmetric(horizontal: 4.0),
+                height: 10,
+                width: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentPage == index ? Colors.blue : Colors.grey,
+                ),
               ),
             ),
           ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        SizedBox(
-          height: 40,
-          child: ListView.builder(
-            itemCount: listTial.length,
-            itemBuilder: (context, index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 4.0),
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 24, 24, 24),
-                  borderRadius: BorderRadius.all(Radius.circular(25)),
-                ),
-                child: Center(
-                  child: Text(
-                    listTial[index],
-                    style: TextStyle(
-                      color: Colors.white, // Màu chữ để dễ nhìn trên nền tối
-                      fontSize: 16, // Cỡ chữ tùy ý
-                    ),
-                  ),
-                ),
-              );
-            },
-            scrollDirection: Axis.horizontal,
-            physics: AlwaysScrollableScrollPhysics(),
+          SizedBox(
+            height: 10,
           ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Data',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        SizedBox(
-          height: 160,
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            itemCount: listTial.length,
-            separatorBuilder: (context, index) {
-              return SizedBox(width: 10); // Khoảng cách giữa các phần tử
-            },
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DetailTail()));
-                },
-                child: Container(
-                  width: 160,
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              itemCount: listTial.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: EdgeInsets.symmetric(horizontal: 4.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/demo.jpg'),
-                      fit: BoxFit.cover,
-                    ),
+                    color: const Color.fromARGB(255, 24, 24, 24),
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
                   ),
                   child: Center(
                     child: Text(
                       listTial[index],
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                        color: Colors.white, // Màu chữ để dễ nhìn trên nền tối
+                        fontSize: 16, // Cỡ chữ tùy ý
                       ),
                     ),
                   ),
-                ),
-              );
-            },
-            scrollDirection: Axis.horizontal,
-            physics: AlwaysScrollableScrollPhysics(),
+                );
+              },
+              scrollDirection: Axis.horizontal,
+              physics: AlwaysScrollableScrollPhysics(),
+            ),
           ),
-        )
-      ],
+          SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Data',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                )),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SizedBox(
+            height: 160,
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              itemCount: listTial.length,
+              separatorBuilder: (context, index) {
+                return SizedBox(width: 10); // Khoảng cách giữa các phần tử
+              },
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailTail(
+                                  tag: 's$index',
+                                )));
+                  },
+                  child: Hero(
+                    tag: 's$index',
+                    child: Container(
+                      width: 160,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/demo.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          listTial[index],
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              scrollDirection: Axis.horizontal,
+              physics: AlwaysScrollableScrollPhysics(),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -10,7 +10,7 @@ class Speechtotext extends StatefulWidget {
 }
 
 class _SpeechtotextState extends State<Speechtotext> {
-  SpeechToText _speechToText = SpeechToText();
+  final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
 
@@ -69,7 +69,7 @@ class _SpeechtotextState extends State<Speechtotext> {
                 child: Text(
                   // If listening is active show the recognized words
                   _speechToText.isListening
-                      ? '5' + '$_lastWords'
+                      ? _lastWords
                       // If listening isn't active but could be tell the user
                       // how to start it, otherwise indicate that speech
                       // recognition is not yet ready or not supported on

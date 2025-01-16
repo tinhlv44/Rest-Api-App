@@ -46,6 +46,7 @@ dependencies:
   bloc: ^8.1.4
   speech_to_text: ^7.0.0
   flutter_tts: ^4.2.1
+  file_picker: ^8.1.7
 
 dev_dependencies:
   flutter_test:
@@ -99,3 +100,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+ 

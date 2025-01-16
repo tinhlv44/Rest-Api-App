@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:rest_api_app/helpers/snak_bar_helper.dart';
+import 'package:rest_api_app/navi/draw.dart';
 import 'package:rest_api_app/page/auth/auth.dart';
 import 'package:rest_api_app/constants/theme.dart';
 import 'package:rest_api_app/gitit/gitit.dart';
-import 'package:rest_api_app/navi/navi.dart';
 import 'package:rest_api_app/util/auth_manager.dart';
 import 'package:rest_api_app/util/mode.dart';
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
               themeMode:
                   themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
               debugShowCheckedModeBanner: false,
-              home: AuthManager.isLogedin() ? MyHomeApp() : AuthPage());
+              home: AuthManager.isLogedin() ? DrawerApp() : AuthPage());
         }));
   }
 }

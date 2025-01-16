@@ -8,7 +8,8 @@ import 'package:rest_api_app/screens/text_to_speech.dart';
 import 'package:rive/rive.dart';
 
 class MyHomeApp extends StatefulWidget {
-  const MyHomeApp({super.key});
+  final Widget widget;
+  const MyHomeApp({super.key, required this.widget});
 
   @override
   State<MyHomeApp> createState() => _MyHomeAppState();
@@ -22,7 +23,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
     Bartender(),
     TTSExample(),
     Speechtotext(),
-    SettingsPage()
+    SettingsPage(),
   ];
   int selectedIcon = 0;
   void animateIcon(int index) {
@@ -57,8 +58,13 @@ class _MyHomeAppState extends State<MyHomeApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //appBar: _buildAppBar(),
-        body: SafeArea(child: listPage[selectedIcon]),
+        appBar: _buildAppBar(),
+        body: SafeArea(
+            child: IndexedStack(
+          index: selectedIcon,
+          children: listPage,
+        )),
+        extendBodyBehindAppBar: true,
         bottomNavigationBar: _buildBottomNavigationBar());
   }
 
@@ -104,20 +110,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
 
   _buildAppBar() {
     return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.api, color: Colors.green),
-          SizedBox(
-            width: 8,
-          ),
-          Text(
-            'Rest Api Call',
-            style: TextStyle(color: Colors.green),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+      leading: widget.widget,
     );
   }
 }

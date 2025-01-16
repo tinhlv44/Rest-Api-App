@@ -48,10 +48,10 @@ class _SettingsPageState extends State<SettingsPage> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: SweepGradient(
               colors: [
-                const Color.fromARGB(0, 82, 80, 80),
-                const Color.fromARGB(255, 197, 238, 198),
+                const Color.fromARGB(255, 184, 255, 185),
+                Colors.white,
               ],
               tileMode: TileMode.clamp,
             ),

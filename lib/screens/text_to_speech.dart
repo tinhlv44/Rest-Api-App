@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class TTSExample extends StatefulWidget {
+  const TTSExample({super.key});
+
   @override
-  _TTSExampleState createState() => _TTSExampleState();
+  State<TTSExample> createState() => _TTSExampleState();
 }
 
 class _TTSExampleState extends State<TTSExample> {
@@ -27,10 +29,6 @@ class _TTSExampleState extends State<TTSExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter TTS Demo'),
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
